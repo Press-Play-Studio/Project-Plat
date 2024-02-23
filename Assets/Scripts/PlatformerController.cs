@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Xml.Xsl;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.EventSystems;
 //using UnityEngine.Windows;
 
 public class PlatformerController : MonoBehaviour
@@ -12,20 +13,22 @@ public class PlatformerController : MonoBehaviour
     //Create state machine. design for scale
     //Create movement and jump methods(consider using 3d controller library unity)
     // Player parameters
-    public float jumpForce;
-    public float jumpSpeed;
-    
-    public float gravityForce;
-    public float lowGrav;
+
+    public float jumpSpeed = 30;
+
+    public float gravityForce = 80;
+    public float lowGrav = 80;
     public float jumpCooldownTime;
 
     public GameObject rCol;
     public GameObject lCol;
-    
+    public Rigidbody rb;
+    public Animator animCont;
+    public GameObject vis;
+
     // Integers
     int jTimer;
     int jBufferTimer;
-    public Rigidbody rb;
     int coyoteBuffer;
 
     public LayerMask ground;
@@ -33,7 +36,7 @@ public class PlatformerController : MonoBehaviour
     // Player parameters tweaked in design
     public float hInput;
     public float vInput;
-    public float moveSpeed = 15f;
+    public float moveSpeed = 25f;
 
     // Vectors
     Vector2 hvec;
@@ -44,11 +47,11 @@ public class PlatformerController : MonoBehaviour
 
 
     //booleans
-    bool isColliding;
+    public bool isColliding;
     bool coyoteSig;
     bool jInput;
     bool jSig;
-    bool wallTouch;
+    public bool wallTouch;
     public bool leftCol;
     public bool rightCol;
     public bool downCol;
@@ -69,8 +72,9 @@ public class PlatformerController : MonoBehaviour
 
     // Update is called once per frame
     void Update()
-    {        
+    {
         updatePlayerParams();
+        animCont = vis.GetComponent<Animator>();
     }
 
     private void FixedUpdate()
@@ -82,17 +86,26 @@ public class PlatformerController : MonoBehaviour
         gravity(gForceVec, wallGForce, -lowGrav);
         wallSlide();
         wallJump();
+        faceDir();
     }
+
+
 
     void wallSlide()
     {
         if (rightCol)
         {
             rb.velocity = new Vector3(Mathf.Clamp(rb.velocity.x,-10,0), -1, 0);
+            wallTouch = true;
         }
         if (leftCol)
         {
             rb.velocity = new Vector3(Mathf.Clamp(rb.velocity.x, 0, 10), -1, 0);
+            wallTouch = true;
+        }
+        if (!leftCol && !rightCol)
+        {
+            wallTouch = false;
         }
     }
 
@@ -112,14 +125,22 @@ public class PlatformerController : MonoBehaviour
     void updatePlayerParams()
     {
         wallGForce = Vector3.zero;
-        jumpVec = new Vector3(0, jumpForce, 0);
         gForceVec = new Vector3(0, -gravityForce, 0);
     }
 
     // Method to make player move
     void move()
     {
-        if (colDirc == colDir.right)//restrict direction if blocked
+        if (rightCol)//restrict direction if blocked
+        {
+            if (hvec.x < 0) { hvec.x = 0; Debug.Log("right move blocked"); }
+            rb.velocity = hvec;
+        }
+        else
+        {
+            hvec.x = hInput * moveSpeed;
+        }
+        if (leftCol)//restrict direction if blocked
         {
             if (hvec.x < 0) { hvec.x = 0; Debug.Log("right move blocked"); }
             rb.velocity = hvec;
@@ -157,6 +178,7 @@ public class PlatformerController : MonoBehaviour
         if(jInput && coyoteSig)
         {
             rb.velocity = new Vector3(rb.velocity.x, jumpSpeed, 0);
+            animCont.SetTrigger("Jump");
             Debug.Log("Just jumped with COYOTE");
             coyoteBuffer = 0;
             coyoteSig= false;
@@ -182,6 +204,7 @@ public class PlatformerController : MonoBehaviour
             {
                 Debug.Log("Just jumped");
                 rb.velocity = new Vector3(rb.velocity.x, jumpSpeed, 0);
+                animCont.SetTrigger("Jump");
                 coyoteSig= false;
             }
 
@@ -202,6 +225,7 @@ public class PlatformerController : MonoBehaviour
                 jBufferTimer = 0;
                 Debug.Log("Just jumped with buffer");
                 rb.velocity = new Vector3(rb.velocity.x, jumpSpeed, 0);
+                animCont.SetTrigger("Jump");
 
             }
             if (jBufferTimer == 2)
@@ -296,4 +320,13 @@ public class PlatformerController : MonoBehaviour
             return 3;
         }
     }
+    void faceDir()
+    {
+        if(moveDirection() == 2)
+        {
+            // fill later
+        }
+    }
 }
+
+
