@@ -47,7 +47,7 @@ public class PlatformerController : MonoBehaviour
 
 
     //booleans
-    public bool isColliding;
+    public bool isBtmColliding;
     bool coyoteSig;
     bool jInput;
     bool jSig;
@@ -56,8 +56,8 @@ public class PlatformerController : MonoBehaviour
     public bool rightCol;
     public bool downCol;
     public bool upCol;
-
-
+    bool isOnGround;
+    bool gOn;
     private colDir colDirc;
 
     // enums
@@ -83,9 +83,9 @@ public class PlatformerController : MonoBehaviour
         move();
         coyoteTime();
         jump();
-        gravity(gForceVec, wallGForce, -lowGrav);
+        gravity(gForceVec, wallGForce, -lowGrav, gOn);
         wallSlide();
-        wallJump();
+        //wallJump();
         faceDir();
     }
 
@@ -121,6 +121,7 @@ public class PlatformerController : MonoBehaviour
         rightCol= false;
         upCol= false;
         downCol= false;
+        gOn = true;
     }
     void updatePlayerParams()
     {
@@ -198,9 +199,9 @@ public class PlatformerController : MonoBehaviour
     [ContextMenu("jump")]
     void jump()
     {
-        if (jInput && isColliding)//Retain Jump for 5 frames if not touchning ground yet
+        if (jInput && isBtmColliding)//Retain Jump for 5 frames if not touchning ground yet
         {
-            if (isColliding)
+            if (isBtmColliding)
             {
                 Debug.Log("Just jumped");
                 rb.velocity = new Vector3(rb.velocity.x, jumpSpeed, 0);
@@ -209,7 +210,7 @@ public class PlatformerController : MonoBehaviour
             }
 
         }
-        else if(jInput && !isColliding)
+        else if(jInput && !isBtmColliding)
         {
             Debug.Log("Just stored input");
             jSig = true;
@@ -219,7 +220,7 @@ public class PlatformerController : MonoBehaviour
         {
             jBufferTimer++;
             Debug.Log("Jump buffer frame count is " + jBufferTimer);
-            if (isColliding && downCol)
+            if (isBtmColliding && downCol)
             {
                 jSig= false;
                 jBufferTimer = 0;
@@ -248,6 +249,25 @@ public class PlatformerController : MonoBehaviour
         Debug.Log("Right Message Received");
     }
 
+    void groundContact(bool isGround)
+    {
+        isOnGround = isGround;
+        isBtmColliding= isGround;
+        Debug.Log("is Btm Colliding is " + true);
+        // raycast this shii guy. not tonight tho
+
+        if (isOnGround == true)//restrict direction if blocked
+        {
+            if (hvec.y < 0) { hvec.y = 0; Debug.Log("Fall speed stop blocked"); }
+            rb.velocity = hvec;
+            gOn = false;
+        }
+        else if (isOnGround == false)
+        {
+            gOn= true;
+        }
+    }
+    //
     //void OnCollisionStay(Collision collisionInfo)
     //{
     //    isColliding = true;
@@ -267,7 +287,7 @@ public class PlatformerController : MonoBehaviour
     //}
     void OnCollisionStay(Collision collision)
     {
-        isColliding= true;
+        //isColliding = true;
       
     }
 
@@ -286,21 +306,28 @@ public class PlatformerController : MonoBehaviour
 
     private void OnCollisionExit(Collision collisionInfo)
     {
-        isColliding = false;
+        //isColliding = false;
         coyoteSig = true;
         Debug.Log("No more coliding" + collisionInfo.gameObject.name);
     }
 
     // gravity Vector
-    void gravity(Vector3 gForce, Vector3 wallForce, float lowGForce)
+    void gravity(Vector3 gForce, Vector3 wallForce, float lowGForce, bool gON)
     {
-        if (rb.velocity.y > 0)
+        if (gON == true)
         {
-            rb.AddForce(new Vector3 (0,lowGForce,0));
+            if (rb.velocity.y > 0)
+            {
+                rb.AddForce(new Vector3(0, lowGForce, 0));
+            }
+            if (rb.velocity.y <= 0)
+            {
+                rb.AddForce(gForce);
+            }
         }
-        if (rb.velocity.y<= 0)
+        else
         {
-            rb.AddForce(gForce);
+            Debug.Log("gravity_suspended");
         }
     }
 

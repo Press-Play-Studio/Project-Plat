@@ -33,7 +33,17 @@ public class PCanimController : MonoBehaviour
             isRun= true;
             animCont.SetBool("isRun", isRun);
         }
-        animCont.SetBool("IsGround", platCont.isColliding);
+
+        if (platCont.rb.velocity.y < -1 && !platCont.isBtmColliding)
+        {
+            Debug.Log("fall block working");
+            animCont.SetBool("IsFall", true);
+        }
+        else
+        {
+            animCont.SetBool("IsFall", false);
+        }
+        animCont.SetBool("IsGround", platCont.isBtmColliding);
         animCont.SetBool("wallTouch", platCont.wallTouch);
         faceDir();
     }
