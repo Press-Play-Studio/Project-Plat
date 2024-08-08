@@ -70,6 +70,7 @@ public class PauseScript : MonoBehaviour
     void initCanvas()
     {
         myUI = new GameObject();
+        mainCam = GetComponent<Camera>();
         myUI.name = "Pause Screen";
     
 
@@ -102,20 +103,4 @@ public class PauseScript : MonoBehaviour
 }
     
 
-    //private void onenable()
-    //{
-    //    pause.action.started += onpause;
-
-
-    //}
-
-    //private void ondisable()
-    //{
-    //    pause.action.started -= onpause;
-    //}
-
-    //void onpause(inputaction.callbackcontext obje)
-    //{
-    //    debug.log("pause input manager go");
-    //}
 
