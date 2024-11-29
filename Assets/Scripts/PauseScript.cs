@@ -33,6 +33,12 @@ public class PauseScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        pauseHandler();
+
+    }
+
+    void pauseHandler()
+    {
         if (onPause())
         {
             if (isPause)
@@ -52,8 +58,6 @@ public class PauseScript : MonoBehaviour
         }
 
     }
-
-
     bool onPause()
     {
         if (Input.GetKeyDown("escape"))

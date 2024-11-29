@@ -34,7 +34,7 @@ public class PCanimController : MonoBehaviour
             animCont.SetBool("isRun", isRun);
         }
 
-        if (platCont.rb.velocity.y < -1 && !platCont.isBtmColliding)
+        if (platCont.rb.velocity.y <= 0.20 && !platCont.isBtmColliding)
         {
             Debug.Log("fall block working");
             animCont.SetBool("IsFall", true);

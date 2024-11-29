@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class CameraController : MonoBehaviour
+
+    // MAKE THIS SCRIPT CREATE THE CAMERA WE ARE USING SO IT IS  REPEATABLE ON NEW LEVELS
+
 {
     public GameObject Player;
     public Vector2 camPos;

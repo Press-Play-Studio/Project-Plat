@@ -27,13 +27,13 @@ public class SideColliderScript : MonoBehaviour
         {
             isLWall = true;
             gameObject.SendMessageUpwards("leftWallSet", isLWall);
-            Debug.Log(this.name + "trigger!!");
+            Debug.Log(this.name + " trigger!!");
         }
         if (!isLeft && trigger.tag == "Normal")
         {
             isRWall = true;
             gameObject.SendMessageUpwards("rightWallSet", isRWall);
-            Debug.Log(this.name + "trigger!!");
+            Debug.Log(this.name + " trigger!!");
         }
 
 
