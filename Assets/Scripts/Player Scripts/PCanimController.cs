@@ -22,7 +22,7 @@ public class PCanimController : MonoBehaviour
     void Update()
     {
         platCont = player.GetComponent<PlatformerController>();
-        if (platCont.rb.velocity.x < 2f && platCont.rb.velocity.x > -2f)
+        if (platCont.rb.linearVelocity.x < 2f && platCont.rb.linearVelocity.x > -2f)
         {
             isRun= false;
             animCont.SetBool("isRun", isRun);
@@ -34,7 +34,7 @@ public class PCanimController : MonoBehaviour
             animCont.SetBool("isRun", isRun);
         }
 
-        if (platCont.rb.velocity.y <= 0.20 && !platCont.isBtmColliding)
+        if (platCont.rb.linearVelocity.y <= 0.20 && !platCont.isBtmColliding)
         {
             Debug.Log("fall block working");
             animCont.SetBool("IsFall", true);
@@ -50,11 +50,11 @@ public class PCanimController : MonoBehaviour
     // Method to know what direction you're moving in
     int moveDirection()
     {
-        if (platCont.rb.velocity.x > 2)
+        if (platCont.rb.linearVelocity.x > 2)
         {
             return 2;
         }
-        else if (platCont.rb.velocity.x < -2)
+        else if (platCont.rb.linearVelocity.x < -2)
         {
             return 1;
         }

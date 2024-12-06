@@ -7,11 +7,15 @@ public class MovingPlatform : MonoBehaviour
 {
     [SerializeField] Collider platformCollider;
     [SerializeField] Transform platformTransform;
+    [SerializeField] Transform[] targetPoints;
     [SerializeField] Rigidbody platformRb;
 
     public float moveRange;
     public bool isVertical;
     public float speed;
+    public int targetPointsRef;
+
+
 
     Vector3 startPos;
     Vector3 moveDir;
@@ -21,19 +25,20 @@ public class MovingPlatform : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        startPos= transform.position;
+        startPos = transform.position;
         platformTransform = transform.Find("Platform").GetComponent<Transform>();
         platformRb = transform.Find("Platform").GetComponent<Rigidbody>();
         gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+        
     }
 
     // Update is called once per frame
     void Update()
     {
-        updateBound();
+        updateDirection();
     }
     
-    void updateBound()
+    void updateDirection()
     {
         if (isVertical)
         {
@@ -54,18 +59,21 @@ public class MovingPlatform : MonoBehaviour
     void moveBlock()
     {
         // if in bounds move change direction
+        // Compute directionand choose speed
+
+
         if (isVertical)
         {
 
-            if (((platformTransform.position.y - startPos.y) < moveRange) && platformRb.velocity.y < 0)
+            if (((platformTransform.position.y - startPos.y) < moveRange) && platformRb.linearVelocity.y < 0)
             {
-                platformRb.velocity = moveDir* speed;
+                platformRb.linearVelocity = moveDir* speed;
                 Debug.Log("moving up");
 
             }
             else
             {
-                platformRb.velocity = moveDir* -speed;
+                platformRb.linearVelocity = moveDir* -speed;
                 Debug.Log("moving down");
             }
         }
@@ -82,5 +90,10 @@ public class MovingPlatform : MonoBehaviour
         {
             Debug.DrawRay(transform.position, moveDir * moveRange, Color.yellow);
         }
+    }
+
+    private void OnCollisionStay(Collision collision)
+    {
+        
     }
 }

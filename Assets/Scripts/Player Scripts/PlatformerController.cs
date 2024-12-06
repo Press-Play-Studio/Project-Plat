@@ -14,7 +14,7 @@ public class PlatformerController : MonoBehaviour
     //Create movement and jump methods(consider using 3d controller library unity)
     // Player parameters
 
-    public float jumpSpeed = 30;
+    public float jumpSpeed = 25;
     public float airMoveSpeed;
     public float gravityForce = 80;
     public float lowGrav = 80;
@@ -22,6 +22,7 @@ public class PlatformerController : MonoBehaviour
     public float wallSlideSpeed;
     public float wallJumpSpeed;
 
+    public PlayerInputManager pInput;
 
 
     //Jumpable ground check
@@ -48,7 +49,7 @@ public class PlatformerController : MonoBehaviour
     public float moveSpeed = 25f;
 
     // Vectors
-    Vector2 hvec;
+    public Vector2 hvec;
     Vector2 vvec;
     public Vector3 gForceVec;
     public Vector3 wallGForce;
@@ -137,13 +138,13 @@ public class PlatformerController : MonoBehaviour
 
     void stopMoving()
     {
-        rb.velocity = Vector3.zero;
+        rb.linearVelocity = Vector3.zero;
     }
     void GetInput()
     {
-        hInput = Input.GetAxis("Horizontal");
-        wInput = Input.GetKey(KeyCode.LeftShift);
-        jInput = Input.GetKey(KeyCode.Space);
+        hInput = pInput.moveValue.x;
+        jInput = pInput.jumpValue;
+        wInput = pInput.grabValue;
     }
 
     void initPlayerParams()
@@ -159,6 +160,8 @@ public class PlatformerController : MonoBehaviour
         wallSlideVel = new Vector3(0, -wallSlideSpeed, 0);
 
 
+
+        pInput = GetComponent<PlayerInputManager>();
         animCont = vis.GetComponent<Animator>(); 
     }
     void updatePlayerParams()
@@ -170,7 +173,7 @@ public class PlatformerController : MonoBehaviour
     // Method to make player move
     void move()
     {
-        hvec.y = rb.velocity.y;
+        hvec.y = rb.linearVelocity.y;
         if (wallJSig)
         {
             Debug.Log("No movement due to wall touch");
@@ -205,7 +208,7 @@ public class PlatformerController : MonoBehaviour
             {
                 hvec.x = hvec.x * moveSpeed;
             }
-            rb.velocity = hvec;
+            rb.linearVelocity = hvec;
 
         }
        
@@ -221,16 +224,16 @@ public class PlatformerController : MonoBehaviour
             if (wInput)
             {
                 wallTouch = true;
-                if (rb.velocity.y < -2f)
+                if (rb.linearVelocity.y < -2f)
                 {
-                    wallSlideVel = new Vector3(rb.velocity.x, -wallSlideSpeed, 0);
+                    wallSlideVel = new Vector3(rb.linearVelocity.x, -wallSlideSpeed, 0);
 
                 }
                 else
                 {
-                    wallSlideVel = rb.velocity;
+                    wallSlideVel = rb.linearVelocity;
                 }
-                rb.velocity = wallSlideVel;
+                rb.linearVelocity = wallSlideVel;
                 gOn = false;
             }
 
@@ -245,16 +248,16 @@ public class PlatformerController : MonoBehaviour
             if (wInput)
             {
                 wallTouch = true;
-                if (rb.velocity.y < -2f)
+                if (rb.linearVelocity.y < -2f)
                 {
-                    wallSlideVel = new Vector3(rb.velocity.x, -wallSlideSpeed, 0);
+                    wallSlideVel = new Vector3(rb.linearVelocity.x, -wallSlideSpeed, 0);
 
                 }
                 else
                 {
-                    wallSlideVel = rb.velocity;
+                    wallSlideVel = rb.linearVelocity;
                 }
-                rb.velocity = wallSlideVel;
+                rb.linearVelocity = wallSlideVel;
                 gOn = false;
                 Debug.Log("Wall is being Grabbed");
             }
@@ -268,7 +271,7 @@ public class PlatformerController : MonoBehaviour
             
         }
 
-        // checks for walls before granting gravity
+        // checks for ground and walls before granting gravity
         else if (!isBtmColliding)
         {
             if (!rightCol)
@@ -305,28 +308,28 @@ public class PlatformerController : MonoBehaviour
         {
             if (jInput && rightCol)
             {
-                rb.velocity = new Vector3(-30, wallJumpSpeed, 0);
+                rb.linearVelocity = new Vector3(-30, wallJumpSpeed, 0);
                 wallJSig = true;
                 animCont.SetTrigger("Jump");
                 Debug.Log("Just Wall Jumped to the right");
             }
             else if (jSig && rightCol)
             {
-                rb.velocity = new Vector3(-30, wallJumpSpeed, 0);
+                rb.linearVelocity = new Vector3(-30, wallJumpSpeed, 0);
                 wallJSig = true;
                 animCont.SetTrigger("Jump");
                 Debug.Log("Just Wall Jumped to the right");
             }
             if (jInput && leftCol)
             {
-                rb.velocity = new Vector3(30, wallJumpSpeed, 0);
+                rb.linearVelocity = new Vector3(30, wallJumpSpeed, 0);
                 wallJSig = true;
                 animCont.SetTrigger("Jump");
                 Debug.Log("Just Wall Jumped to the left");
             }
             else if (jSig && leftCol)
             {
-                rb.velocity = new Vector3(30, wallJumpSpeed, 0);
+                rb.linearVelocity = new Vector3(30, wallJumpSpeed, 0);
                 Debug.Log("Just Wall Jumped to the left");
                 animCont.SetTrigger("Jump");
                 wallJSig = true;
@@ -339,7 +342,7 @@ public class PlatformerController : MonoBehaviour
     {
         if(jInput && coyoteSig)
         {
-            rb.velocity = new Vector3(rb.velocity.x, jumpSpeed, 0);
+            rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpSpeed, 0);
             //animCont.SetTrigger("Jump");
             Debug.Log("Just jumped with COYOTE");
             coyoteBuffer = 0;
@@ -361,7 +364,7 @@ public class PlatformerController : MonoBehaviour
             if (isBtmColliding)
             {
                 Debug.Log("Just jumped");
-                rb.velocity = new Vector3(rb.velocity.x, jumpSpeed, 0);
+                rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpSpeed, 0);
                 animCont.SetTrigger("Jump");
                 coyoteSig= false;
             }
@@ -382,7 +385,7 @@ public class PlatformerController : MonoBehaviour
                 jSig= false;
                 jBufferTimer = 0;
                 Debug.Log("Just jumped with buffer");
-                rb.velocity = new Vector3(rb.velocity.x, jumpSpeed, 0);
+                rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpSpeed, 0);
                 animCont.SetTrigger("Jump");
 
             }
@@ -421,7 +424,7 @@ public class PlatformerController : MonoBehaviour
 
 
             isBtmColliding = true;
-            animCont.SetBool("IsGround", isBtmColliding);
+
         }
 
         else
@@ -429,7 +432,7 @@ public class PlatformerController : MonoBehaviour
             Debug.Log("Did not Hit");
             Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.down) * 1, Color.white);
             isBtmColliding = false;
-            animCont.SetBool("IsGround", isBtmColliding);
+
             if (previsBtmColliding)
             {
                 coyoteSig = true;
@@ -442,7 +445,7 @@ public class PlatformerController : MonoBehaviour
         if (isBtmColliding == true)//restrict direction if blocked
         {
             if (hvec.y < 0) { hvec.y = 0; Debug.Log("Fall speed stop blocked"); }
-            rb.velocity = hvec;
+            rb.linearVelocity = hvec;
             gOn = false;
         }
 
@@ -502,11 +505,11 @@ public class PlatformerController : MonoBehaviour
     {
         if (gON == true)
         {
-            if (rb.velocity.y > 0)
+            if (rb.linearVelocity.y > 0)
             {
                 rb.AddForce(new Vector3(0, lowGForce, 0));
             }
-            if (rb.velocity.y <= 0)
+            if (rb.linearVelocity.y <= 0)
             {
                 rb.AddForce(gForce);
             }
@@ -525,12 +528,12 @@ public class PlatformerController : MonoBehaviour
     // Method to know what direction you're moving in
     int moveDirection()
     {
-        if (rb.velocity.x > 0)
+        if (rb.linearVelocity.x > 0)
         {
             return 2;
             
         }
-        else if (rb.velocity.x < 0)
+        else if (rb.linearVelocity.x < 0)
         {
             return 1;
         }
