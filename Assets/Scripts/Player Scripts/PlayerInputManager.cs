@@ -6,9 +6,6 @@ using UnityEngine.InputSystem;
 
 public class PlayerInputManager : MonoBehaviour
 {
-
-
-
     public Vector2 moveValue;
     public bool jumpValue;
     public bool grabValue;
@@ -17,7 +14,6 @@ public class PlayerInputManager : MonoBehaviour
     public InputAction jumpAction;
     public InputAction grabAction;
 
-    // Start is called before the first frame update
     void Start()
     {
         moveAction = InputSystem.actions.FindAction("Move");

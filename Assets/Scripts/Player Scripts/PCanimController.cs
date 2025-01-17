@@ -43,8 +43,12 @@ public class PCanimController : MonoBehaviour
         {
             animCont.SetBool("IsFall", false);
         }
+        
         animCont.SetBool("IsGround", platCont.isBtmColliding);
         animCont.SetBool("wallTouch", platCont.wallTouch);
+        animCont.SetBool("wallGrab", platCont.wallTouch);
+        // change platcont walltouch to wall grab and implement walltouch to be a signal to player that a grab is possible
+
         faceDir();
     }
     // Method to know what direction you're moving in
