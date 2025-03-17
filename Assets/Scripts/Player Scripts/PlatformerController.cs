@@ -21,6 +21,8 @@ public class PlatformerController : MonoBehaviour
     public float jumpCooldownTime;
     public float wallSlideSpeed;
     public float wallJumpSpeed;
+    public float dashCoolDownTime;
+    public bool dashcooldone;
 
     public PlayerInputManager pInput;
 
@@ -40,38 +42,48 @@ public class PlatformerController : MonoBehaviour
     int jTimer;
     int jBufferTimer;
     int coyoteBuffer;
+    int dashBuffer;
+    int dashCooldown;
     int wallJbuffer; //restricts sideways movement for a few frames after wall jump
     public LayerMask ground;
 
     // Player parameters tweaked in design
-    public float hInput;
-    public float vInput;
+
     public float moveSpeed = 25f;
+    public float dashSpeed = 10.0f;
+
 
     // Vectors
     public Vector2 hvec;
     Vector2 vvec;
-    public Vector3 gForceVec;
-    public Vector3 wallGForce;
+    Vector3 gForceVec;
+    Vector3 wallGForce;
     Vector3 jumpVec;
-    Vector3 wallSlideVel;
-    Vector3 defaultPos;
 
+    Vector3 wallSlideVel; // the vector that controlls wall fall speed
+    Vector3 defaultPos; // the default position for the level/section 
+    public Vector3 dashVelocity; // dash velocity vector
 
     //booleans
     public bool isBtmColliding;
     public bool previsBtmColliding;
 
-    bool coyoteSig;
+    float hInput;
+    float vInput;
     bool jInput;
     bool wInput;
+    public bool dashInp;
+
     bool jSig;
     bool wallJSig;
+    bool coyoteSig;
+    bool dashSig;
+    bool dashdone;
     public bool wallTouch;
-    public bool leftCol;
-    public bool rightCol;
-    public bool downCol;
-    public bool upCol;
+    bool leftCol;
+    bool rightCol;
+    bool downCol;
+     bool upCol;
     bool isOnGround;
     bool gOn;
     
@@ -110,6 +122,7 @@ public class PlatformerController : MonoBehaviour
         wallSlide();
         wallJump();
         faceDir();
+        dashAttack();
     }
 
     void bufferRefresh()
@@ -131,8 +144,32 @@ public class PlatformerController : MonoBehaviour
                 wallJbuffer = 0;
                 wallJSig = false;
             }
-        }    
+        }
+        if (dashSig)
+        {
+            dashBuffer++;
+            dashcooldone = false;
+            if (dashBuffer == 5)
+            {
+                dashBuffer = 0;
+                dashSig = false;
+                dashdone = true;
+                
+            }
+        }
+            if (dashdone)
+            {
+                dashCooldown++;
+                if (dashCooldown == dashCoolDownTime * 60)
+                {
+                    dashcooldone = true;
+                    dashCooldown = 0;
+                    dashdone = false;
+                }
+
+            }
         
+
 
     }
 
@@ -140,11 +177,34 @@ public class PlatformerController : MonoBehaviour
     {
         rb.linearVelocity = Vector3.zero;
     }
+
+    void dashAttack()
+    {
+        if (dashInp)
+        {
+
+                if (dashcooldone)
+                            {
+                                dashSig = true;
+                                rb.linearVelocity = dashVelocity;
+                                Debug.Log("Dash went off");
+                            }
+                            else
+                            {
+                                Debug.Log("Not done cooling");
+                            }
+            }
+
+        
+    
+    }
     void GetInput()
     {
         hInput = pInput.moveValue.x;
+        vInput = pInput.moveValue.y;
         jInput = pInput.jumpValue;
         wInput = pInput.grabValue;
+        dashInp = pInput.dashValue;
     }
 
     void initPlayerParams()
@@ -153,6 +213,8 @@ public class PlatformerController : MonoBehaviour
         rightCol= false;
         upCol= false;
         downCol= false;
+        dashSig= false;
+        dashcooldone = true;
         wallJbuffer = 0;
         gOn = true;
         stopMoving();
@@ -168,6 +230,8 @@ public class PlatformerController : MonoBehaviour
     {
         wallGForce = Vector3.zero;
         gForceVec = new Vector3(0, -gravityForce, 0);
+        dashVelocity.x = dashSpeed * moveDirection() ;
+        dashVelocity.y = rb.linearVelocity.y;
     }
 
     // Method to make player move
@@ -208,6 +272,11 @@ public class PlatformerController : MonoBehaviour
             {
                 hvec.x = hvec.x * moveSpeed;
             }
+
+            if (dashSig)
+            {
+                hvec.x = dashVelocity.x;
+            }
             rb.linearVelocity = hvec;
 
         }
@@ -221,7 +290,7 @@ public class PlatformerController : MonoBehaviour
 
         if (rightCol && !isBtmColliding)
         {
-            if (wInput)
+            if (true)
             {
                 wallTouch = true;
                 if (rb.linearVelocity.y < -2f)
@@ -245,7 +314,7 @@ public class PlatformerController : MonoBehaviour
         }
         else if (leftCol && !isBtmColliding)
         {
-            if (wInput)
+            if (true)
             {
                 wallTouch = true;
                 if (rb.linearVelocity.y < -2f)
@@ -526,20 +595,20 @@ public class PlatformerController : MonoBehaviour
     }
 
     // Method to know what direction you're moving in
-    int moveDirection()
+    float moveDirection()
     {
         if (rb.linearVelocity.x > 0)
         {
-            return 2;
+            return 1;
             
         }
         else if (rb.linearVelocity.x < 0)
         {
-            return 1;
+            return -1;
         }
         else
         {
-            return 3;
+            return 0;
         }
     }
     void faceDir()
@@ -550,15 +619,14 @@ public class PlatformerController : MonoBehaviour
         }
     }
 
-
-    private void OnGUI()
+    void resetPlayerPosition()
     {
-        if (GUILayout.Button("Reset Player"))
-        {
-            transform.position = defaultPos;
-            Debug.Log("Hello!");
-        }
+        transform.position = defaultPos;
+        Debug.Log("position reset");
     }
+
+
+
 }
 
 

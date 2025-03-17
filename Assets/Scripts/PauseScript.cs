@@ -5,6 +5,7 @@ using UnityEditor;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using TMPro;
+using Unity.VisualScripting;
 
 public class PauseScript : MonoBehaviour
 {
@@ -16,93 +17,100 @@ public class PauseScript : MonoBehaviour
     private float fixedDeltaTime;
 
 
+    // Player character reference
+    public PlayerCharacter pScript;
+    public GameObject player;
+
+    // 
+
+
     //UI variables
-    public GameObject pauseUI;
-    public GameObject exitButtonUI;
-    GameObject pauseText;
-    public Canvas myCanvas;
-    RectTransform rectTransform;
-    public TextMeshPro pausedText;
+    public Canvas pauseCanvas;
+    public TextMeshProUGUI pauseText;
 
     // Start is called before the first frame update
     void Start()
     {
         this.fixedDeltaTime = Time.fixedDeltaTime;
         pause = InputSystem.actions.FindAction("Pause");
-
-        initCanvas();
+        isPause = false;
+        pauseCanvas.gameObject.SetActive(false);
+        pScript = GetComponentInParent<PlayerCharacter>();
+        //player = GetComponentInParent<GameObject>();
+        pScript = player.GetComponent<PlayerCharacter>();
 
     }
 
     // Update is called once per frame
     void Update()
     {
+        GetInput();
         pauseHandler();
         
     }
 
+    void GetInput()
+    {
+        pauseButton = pause.WasPerformedThisFrame();
+        pauseCanvas.renderMode = RenderMode.ScreenSpaceCamera;
+        pauseCanvas.worldCamera = mainCam;
+
+
+    }
     void pauseHandler()
     {
-        if (pauseButton = pause.WasPressedThisFrame())
+        if (pauseButton)
         {
             if (isPause)
             {
                 Time.timeScale = 1f;
-                myCanvas.gameObject.SetActive(false);//remove ui overlay
+                pauseCanvas.gameObject.SetActive(false);//remove ui overlay
                 isPause = false;
                 Debug.Log("In play state");
             }
             else
             {
-                Time.timeScale = 0f; //stop time
-                myCanvas.gameObject.SetActive(true); //overlay ui
+                Time.timeScale = 0.01f; //stop time
+                pauseCanvas.gameObject.SetActive(true); //overlay ui
                 isPause = true;
                 Debug.Log("In Pause State");
             }
+            Debug.Log("Pause button Pressed");
+
+        }
+        else
+        {
+            Debug.Log("Pause not Pressed");
         }
 
     }
 
+    public void resumeButton()
+    {
+        Time.timeScale = 1f;
+        pauseCanvas.gameObject.SetActive(false);//remove ui overlay
+        isPause = false;
+        Debug.Log("In play state");
+    }
 
     public void closeGame()
     {
         Application.Quit();
     }
-    void initCanvas()
-    {
-
-        mainCam = GetComponentInChildren<Camera>();
-        pauseUI.name = "Pause Screen";
     
+    IEnumerator UnscaledUpdate()// put other code that needs to run while paused here
+    {
+        while (isPause)
+        {
+            GetInput();
+            pauseHandler();
+            if (!isPause)
+            {
+                yield break;
+            }
+        }
+        yield return null;
 
-        //myCanvas= pauseUI.AddComponent<Canvas>();
-        myCanvas.renderMode = RenderMode.ScreenSpaceCamera;
-        myCanvas.worldCamera= mainCam;
-   
-
-        //pauseUI.AddComponent<CanvasScaler>();
-        //pauseUI.AddComponent<GraphicRaycaster>();
-
-        myCanvas.gameObject.SetActive(false);
-        //Text
-
-        // -Game Paused- Text
-        pauseText = new GameObject();
-        pauseText.transform.parent = pauseUI.transform;
-        pauseText.name = "Game Paused";
-
-
-        pausedText = pauseText.AddComponent<TextMeshPro>();
-        pausedText.text = "game paused";
-        pausedText.fontSize = 100;
-        pausedText.color = Color.red;
-
-        // - Game Paused -Text position
-        rectTransform = pauseText.GetComponent<RectTransform>();
-        //rectTransform.localPosition = new Vector3(0, 0, 0);
-        //rectTransform.sizeDelta = new Vector2(400, 200);
-
-        Debug.Log("canvas exists");
     }
 }
     

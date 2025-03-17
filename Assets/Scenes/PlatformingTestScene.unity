@@ -611,6 +611,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2254022593342915756, guid: 96efc0440fa52294082680dc0944b821, type: 3}
+      propertyPath: dashSpeed
+      value: 100
+      objectReference: {fileID: 0}
     - target: {fileID: 2254022593342915758, guid: 96efc0440fa52294082680dc0944b821, type: 3}
       propertyPath: m_RootOrder
       value: 1
@@ -1110,6 +1114,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4294447081241245345, guid: b79cc70d46ea88845aa7e7471cadab50, type: 3}
+      propertyPath: dashAction.m_Name
+      value: Dash
+      objectReference: {fileID: 0}
     - target: {fileID: 8313458836503776017, guid: b79cc70d46ea88845aa7e7471cadab50, type: 3}
       propertyPath: m_LocalPosition.x
       value: -146.9
@@ -1149,6 +1157,18 @@ PrefabInstance:
     - target: {fileID: 8313458836503776017, guid: b79cc70d46ea88845aa7e7471cadab50, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8313458836503776019, guid: b79cc70d46ea88845aa7e7471cadab50, type: 3}
+      propertyPath: dashSpeed
+      value: 300
+      objectReference: {fileID: 0}
+    - target: {fileID: 8313458836503776019, guid: b79cc70d46ea88845aa7e7471cadab50, type: 3}
+      propertyPath: jumpSpeed
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 8313458836503776019, guid: b79cc70d46ea88845aa7e7471cadab50, type: 3}
+      propertyPath: dashCoolDownTime
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8313458836503776109, guid: b79cc70d46ea88845aa7e7471cadab50, type: 3}
       propertyPath: m_Name
